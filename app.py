@@ -6,7 +6,7 @@ import logging
 import os
 import uuid
 from typing import Dict, List, Optional, Union, Any
-from datetime import datetime
+from datetime import datetime,UTC
 from enum import Enum
 
 import uvicorn
@@ -234,7 +234,7 @@ async def execute_task(task_id: str, instruction: str, ai_provider: str):
         result = await agent.run()
         
         # Update finished timestamp
-        tasks[task_id]["finished_at"] = datetime.utcnow().isoformat() + "Z"
+        tasks[task_id]["finished_at"] = datetime.now(UTC).isoformat()+ "Z"
         
         # Update task status
         tasks[task_id]["status"] = TaskStatus.FINISHED
@@ -289,7 +289,8 @@ async def execute_task(task_id: str, instruction: str, ai_provider: str):
 async def run_task(request: TaskRequest):
     """Start a browser automation task"""
     task_id = str(uuid.uuid4())
-    now = datetime.utcnow().isoformat() + "Z"
+    now = datetime.now(UTC).isoformat()+ "Z"
+
     
     # Initialize task record
     tasks[task_id] = {
@@ -365,7 +366,7 @@ async def stop_task(task_id: str):
         return {"message": "Task stopping"}
     else:
         tasks[task_id]["status"] = TaskStatus.STOPPED
-        tasks[task_id]["finished_at"] = datetime.utcnow().isoformat() + "Z"
+        tasks[task_id]["finished_at"] = datetime.now(UTC).isoformat()+ "Z"
         return {"message": "Task stopped (no agent found)"}
 
 @app.put("/api/v1/pause-task/{task_id}")
